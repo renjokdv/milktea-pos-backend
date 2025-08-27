@@ -13,6 +13,7 @@ router.use('/users', require('./user.routes'));          // e.g. Admin CRUD
 router.use('/inventory', require('./inventory/masters.routes')); // e.g. Inventory CRUD
 router.use('/inventory/products', require('./inventory/product.routes'));
 router.use('/inventory/stock', require('./inventory/stock.routes'));
+router.use('/sales', require('./sales/sale.routes'));
 
 
 

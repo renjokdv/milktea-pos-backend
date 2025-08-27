@@ -1,0 +1,27 @@
+// backend/models/sales/Sale.js
+const mongoose = require('mongoose');
+
+const itemSchema = new mongoose.Schema(
+  {
+    product:   { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+    name:      { type: String, required: true },  // denormalize for stable history
+    qty:       { type: Number, required: true, min: 1 },
+    price:     { type: Number, required: true, min: 0 }, // selling price used
+    subtotal:  { type: Number, required: true, min: 0 }
+  },
+  { _id: false }
+);
+
+const saleSchema = new mongoose.Schema(
+  {
+    cashier:   { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    items:     { type: [itemSchema], required: true },
+    total:     { type: Number, required: true, min: 0 },
+    paid:      { type: Number, required: true, min: 0 },
+    change:    { type: Number, required: true, min: 0 },
+    note:      { type: String }
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model('Sale', saleSchema);
