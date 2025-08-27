@@ -7,8 +7,9 @@ router.get('/', (req, res) => {
   res.json({ name: 'MilkTea POS API', version: '1.0' });
 });
 
-// Wire up feature routes (make sure these files exist!)
-router.use('/auth', require('./auth.routes'));   // e.g. POST /api/auth/login
-router.use('/users', require('./user.routes')); // e.g. Admin CRUD
+// Wire up feature routes
+router.use('/auth', require('./auth.routes'));           // e.g. POST /api/auth/login
+router.use('/users', require('./user.routes'));          // e.g. Admin CRUD
+router.use('/inventory', require('./inventory/masters.routes')); // e.g. Inventory CRUD
 
 module.exports = router;
