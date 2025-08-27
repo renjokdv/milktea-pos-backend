@@ -14,6 +14,7 @@ router.use('/inventory', require('./inventory/masters.routes')); // e.g. Invento
 router.use('/inventory/products', require('./inventory/product.routes'));
 router.use('/inventory/stock', require('./inventory/stock.routes'));
 router.use('/sales', require('./sales/sale.routes'));
+router.use('/reports', require('./sales/report.routes'));
 
 
 
