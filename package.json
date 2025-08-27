@@ -1,12 +1,17 @@
 {
-  "name": "backend",
+  "name": "milktea-pos-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.18 <23"
+  },
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon server.js",
-    "start": "node server.js",
-    "seed:admin": "node seed/seedAdmin.js"
+    "start": "cross-env NODE_ENV=production node server.js",
+    "seed:admin": "node seed/seedAdmin.js",
+    "smoke": "node scripts/smoke.js"
   },
   "keywords": [],
   "author": "",
@@ -21,13 +26,16 @@
     "dayjs": "^1.11.14",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.0.1",
     "helmet": "^8.1.0",
     "joi": "^18.0.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.0",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
-    "pdfkit": "^0.17.1"
+    "pdfkit": "^0.17.1",
+    "xss-clean": "^0.1.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
