@@ -1,9 +1,9 @@
+// backend/controllers/sales/report.controller.js
 const dayjs = require('dayjs');
 const Sale = require('../../models/sales/Sale');
-const createCsvWriter = require('csv-writer').createObjectCsvStringifier;
+const { createObjectCsvStringifier } = require('csv-writer');
 const PDFDocument = require('pdfkit');
 
-// helper to get date boundaries
 function rangeFor(period) {
   const now = dayjs();
   switch (period) {
@@ -17,7 +17,7 @@ function rangeFor(period) {
 
 exports.summary = async (req, res, next) => {
   try {
-    const { period } = req.params; // daily|weekly|monthly|annual
+    const { period } = req.params;
     const r = rangeFor(period);
     if (!r) return res.status(400).json({ message: 'Invalid period' });
 
@@ -44,23 +44,28 @@ exports.exportCsv = async (req, res, next) => {
 
     const sales = await Sale.find({ createdAt: { $gte: r.from.toDate(), $lte: r.to.toDate() } });
 
-    const csv = createCsvWriter({
+    const stringifier = createObjectCsvStringifier({
       header: [
         { id: 'date', title: 'DATE' },
         { id: 'total', title: 'TOTAL' },
         { id: 'paid', title: 'PAID' },
-        { id: 'change', title: 'CHANGE' }
-      ]
-    }).stringifyRecords(sales.map(s => ({
-      date: dayjs(s.createdAt).format('YYYY-MM-DD HH:mm'),
-      total: s.total,
-      paid: s.paid,
-      change: s.change
-    })));
+        { id: 'change', title: 'CHANGE' },
+      ],
+    });
+
+    const header = stringifier.getHeaderString();
+    const records = stringifier.stringifyRecords(
+      sales.map(s => ({
+        date: dayjs(s.createdAt).format('YYYY-MM-DD HH:mm'),
+        total: s.total,
+        paid: s.paid,
+        change: s.change,
+      }))
+    );
 
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', `attachment; filename="sales_${period}.csv"`);
-    res.send(csv);
+    res.send(header + records);
   } catch (e) { next(e); }
 };
 
@@ -72,18 +77,19 @@ exports.exportPdf = async (req, res, next) => {
 
     const sales = await Sale.find({ createdAt: { $gte: r.from.toDate(), $lte: r.to.toDate() } });
 
-    const doc = new PDFDocument({ margin: 30 });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="sales_${period}.pdf"`);
 
-    doc.text(`Sales Report: ${period.toUpperCase()} (${r.from.format('YYYY-MM-DD')} to ${r.to.format('YYYY-MM-DD')})`);
+    const doc = new PDFDocument({ margin: 30 });
+    doc.pipe(res); // <-- pipe first
+
+    doc.fontSize(14).text(`Sales Report: ${period.toUpperCase()} (${r.from.format('YYYY-MM-DD')} to ${r.to.format('YYYY-MM-DD')})`);
     doc.moveDown();
 
     sales.forEach(s => {
-      doc.text(`${dayjs(s.createdAt).format('YYYY-MM-DD HH:mm')}  -  TOTAL: ${s.total}`);
+      doc.fontSize(11).text(`${dayjs(s.createdAt).format('YYYY-MM-DD HH:mm')}  —  TOTAL: ${s.total}`);
     });
 
-    doc.end();
-    doc.pipe(res);
+    doc.end(); // <-- end after writing
   } catch (e) { next(e); }
 };

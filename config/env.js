@@ -20,6 +20,6 @@ module.exports = {
   MONGO_URI: required('MONGO_URI'),
   JWT_SECRET: required('JWT_SECRET'),
   // CORS allowlist (comma-separated) e.g. "http://localhost:5173,https://pos.yourdomain.com"
-  CORS_ORIGINS: (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean),
+  CORS_ORIGINS: (process.env.CORS_ORIGINS || 'http://localhost:3000').split(',').map(s => s.trim()).filter(Boolean),
   isProd,
 };

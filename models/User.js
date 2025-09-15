@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-const ROLES = ['ADMIN', 'INVENTORY', 'CASHIER']; // fixed roles
+const ROLES = ['ADMIN', 'INVENTORY', 'CASHIER'];
 
 const userSchema = new mongoose.Schema(
   {
@@ -10,15 +10,15 @@ const userSchema = new mongoose.Schema(
     name:      { type: String, required: true, trim: true },
     role:      { type: String, enum: ROLES, required: true },
     password:  { type: String, required: true, minlength: 6 },
-    isActive:  { type: Boolean, default: true }
+    isActive:  { type: Boolean, default: true },
+    avatarUrl: { type: String, default: null },   // <-- added
   },
   { timestamps: true }
 );
 
-// Hash password before save
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 10); // saltRounds=10
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
